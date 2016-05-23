@@ -27,6 +27,47 @@ def compare(ltype, drec, deva, target_user, count, calcResult):
     precision /= len(rec_user)
     user_coverage = len(rec_user) * 1.0 / len(target_user)
     calcResult.loc[count] = [ltype, precision, recall, user_coverage]
+    filename = "../conf_interval/" + ltype + "_precision"
+    f = open(filename, "a")
+    print >> f, precision
+    f.close()
+    filename = "../conf_interval/" + ltype + "_recall"
+    f = open(filename, "a")
+    print >> f, recall
+    f.close()
+    # print ltype, precision, recall, user_coverage
+
+def compareFolderOutput(ltype, dir, drec, deva, target_user, count, calcResult):
+    recall = 0
+    precision = 0
+    rec_user = drec.keys()
+    for i in rec_user:
+        t = set(deva[i])
+        r = set(drec[i])
+        k = len(r)
+        c_num = len(t.intersection(r))
+        recall += c_num * 1.0 / len(t)
+        precision += c_num * 1.0 / k
+    recall /= len(rec_user)
+    precision /= len(rec_user)
+    user_coverage = len(rec_user) * 1.0 / len(target_user)
+    calcResult.loc[count] = [ltype, precision, recall, user_coverage]
+    # if not os.path.exists("../conf_interval"):
+    #     os.mkdir("../conf_interval")
+    if not os.path.exists("../conf_interval/" + dir):
+        os.mkdir("../conf_interval/" + dir)
+    if not os.path.exists("../conf_interval/" + dir + "/precision"):
+        os.mkdir("../conf_interval/" + dir + "/precision")
+    if not os.path.exists("../conf_interval/" + dir + "/recall"):
+        os.mkdir("../conf_interval/" + dir + "/recall")
+    filename = "../conf_interval/" + dir + "/precision/" + str(ltype)
+    f = open(filename, "a")
+    print >> f, precision
+    f.close()
+    filename = "../conf_interval/" + dir + "/recall/" + str(ltype)
+    f = open(filename, "a")
+    print >> f, recall
+    f.close()
     # print ltype, precision, recall, user_coverage
 
 
@@ -65,37 +106,37 @@ for i in np.arange(2):
     methodName = methodNames.split('_')  # eg.: recavg_ib_cos
     name_test = methodName[1] + "_" + methodName[2] + "_test"
     if methodName[1] == 'ub':
-        degreearg = "python ../complete_degrees_ML.py ub ./similarity_" + name_test
-        sfarg = "../socialfiltering -u 6041 -i 3953 -r ratings_train.dat -t target_users.dat -l ratings_test_input.dat -g similarity_" + name_test + "_complete -k 10 -a weighted_" + name_test + " > ./avg_" + name_test
+        degreearg = "python ../../complete_degrees_ML.py ub ./similarity_" + name_test
+        sfarg = "../../socialfiltering -u 6041 -i 3953 -r ratings_train.dat -t target_users.dat -l ratings_test_input.dat -g similarity_" + name_test + "_complete -k 10 -a weighted_" + name_test + " > ./avg_" + name_test
         if methodName[2] == 'cos':
-            simarg = "../sim-cosine -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat > ./similarity_" + name_test
+            simarg = "../../sim-cosine -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat > ./similarity_" + name_test
         elif methodName[2] == 'jaccard':
-            simarg = "../sim-jaccard -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat > ./similarity_" + name_test
+            simarg = "../../sim-jaccard -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat > ./similarity_" + name_test
         elif methodName[2] == 'q1a0':
-            simarg = "../sim-cosine -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat -q 1 -a 0 > ./similarity_" + name_test
+            simarg = "../../sim-cosine -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat -q 1 -a 0 > ./similarity_" + name_test
         elif methodName[2] == 'q1a0.5':
-            simarg = "../sim-cosine -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat -q 1 -a 0.5 > ./similarity_" + name_test
+            simarg = "../../sim-cosine -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat -q 1 -a 0.5 > ./similarity_" + name_test
         elif methodName[2] == 'q5a0':
-            simarg = "../sim-cosine -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat -q 5 -a 0 > ./similarity_" + name_test
+            simarg = "../../sim-cosine -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat -q 5 -a 0 > ./similarity_" + name_test
         elif methodName[2] == 'q5a0.5':
-            simarg = "../sim-cosine -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat -q 5 -a 0.5 > ./similarity_" + name_test
+            simarg = "../../sim-cosine -u 6041 -i 3953 -r ratings_train.dat -t ratings_test_input.dat -q 5 -a 0.5 > ./similarity_" + name_test
     elif methodName[1] == 'ib':
-        degreearg = "python ../complete_degrees_ML.py ib ./similarity_" + name_test
-        sfarg = "../socialfiltering -u 6041 -i 3953 -r ratings_train.dat -t target_users.dat -l ratings_test_input.dat -g similarity_" + name_test + "_complete -k 10 -b 1 -a weighted_" + name_test + " > ./avg_" + name_test
+        degreearg = "python ../../complete_degrees_ML.py ib ./similarity_" + name_test
+        sfarg = "../../socialfiltering -u 6041 -i 3953 -r ratings_train.dat -t target_users.dat -l ratings_test_input.dat -g similarity_" + name_test + "_complete -k 10 -b 1 -a weighted_" + name_test + " > ./avg_" + name_test
         if methodName[2] == 'cos':
-            simarg = "../sim-cosine -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat > ./similarity_" + name_test
+            simarg = "../../sim-cosine -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat > ./similarity_" + name_test
         elif methodName[2] == 'jaccard':
-            simarg = "../sim-jaccard -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat > ./similarity_" + name_test
+            simarg = "../../sim-jaccard -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat > ./similarity_" + name_test
         elif methodName[2] == 'q1a0':
-            simarg = "../sim-cosine -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat -q 1 -a 0 > ./similarity_" + name_test
+            simarg = "../../sim-cosine -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat -q 1 -a 0 > ./similarity_" + name_test
         elif methodName[2] == 'q1a0.5':
-            simarg = "../sim-cosine -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat -q 1 -a 0.5 > ./similarity_" + name_test
+            simarg = "../../sim-cosine -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat -q 1 -a 0.5 > ./similarity_" + name_test
         elif methodName[2] == 'q5a0':
-            simarg = "../sim-cosine -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat -q 5 -a 0 > ./similarity_" + name_test
+            simarg = "../../sim-cosine -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat -q 5 -a 0 > ./similarity_" + name_test
         elif methodName[2] == 'q5a0.5':
-            simarg = "../sim-cosine -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat -q 5 -a 0.5 > ./similarity_" + name_test
+            simarg = "../../sim-cosine -i 6041 -u 3953 -r ratings_train_iuv.dat -t ratings_train_iuv.dat -q 5 -a 0.5 > ./similarity_" + name_test
         elif methodName[2] == 'arule':
-            os.system("../apriori-simple.py ratings_train.dat")
+            os.system("../../apriori-simple.py ratings_train.dat")
             simarg = "sed '/-/d;/inf/d;/^$/d' sim_arule > ./similarity_" + name_test
     os.system(simarg)
     os.system(degreearg)
@@ -106,6 +147,7 @@ for i in np.arange(2):
         filepath = "./weighted_" + name_test
     applist = pd.read_csv(filepath, delimiter=' ', names=['user', 'item', 'score'])
     drec = {k: g["item"].tolist() for k, g in applist.groupby("user")}
+    methodNames += "_test"
     compare(methodNames, drec, deva, target_user, i, resultBestSet)
     # Normalization
     applist['score'] = (applist['score'] - applist['score'].min()) / (applist['score'].max() - applist['score'].min())
@@ -113,10 +155,13 @@ for i in np.arange(2):
 print >> outfile, resultBestSet
 print now(), "Phase 2 - run 5 best RS's on test set done."
 # Merge the best 2 RS's with Power Means
-set1 = bestSet.iloc[0]
-set2 = bestSet.iloc[1]
-set1List = finalSets[0]
-set2List = finalSets[1]
+testBestSetNames = resultBestSet.sort_values('Precision', ascending=False).iloc[0:2, :]['Type']
+if testBestSetNames.iloc[0].find(bestSet.iloc[0]) != -1:
+    set1List = finalSets[0]
+    set2List = finalSets[1]
+else:
+    set1List = finalSets[1]
+    set2List = finalSets[0]
 
 for K in np.arange(21):
     alpha = K / 20.0
@@ -158,19 +203,22 @@ for K in np.arange(21):
     recR = pd.read_csv(r, sep=' ', header=None, names=['u', 'v', 'w'])
     drec = {k: g["v"].tolist() for k, g in rec.groupby("u")}
     drecR = {k: g["v"].tolist() for k, g in recR.groupby("u")}
-    compare(alpha, drec, deva, target_user, K, resultAlpha)
-    compare(alpha, drecR, deva, target_user, K, resultR)
+
+    # compare(alpha, drec, deva, target_user, K, resultAlpha)
+    # compare(alpha, drecR, deva, target_user, K, resultR)
+    compareFolderOutput(alpha, "power_means_r=1", drec, deva, target_user, K, resultAlpha)
+    compareFolderOutput(alpha, "power_means_r=5", drecR, deva, target_user, K, resultR)
     f.close()
     r.close()
-#fig = plt.figure()
-#ax = plt.axes()
-#ax.plot(resultAlpha['Alpha'], resultAlpha['Precision'], '-b', label='Precision r=1')
-#ax.plot(resultR['Alpha'], resultR['Precision'], '-g', label='Precision r=5')
-#ax.legend(loc=2)
-#title = 'Power Means on ' + set1 + '/' + set2
-#ax.set_title(title)
-#ax.set_xlabel('Alpha')
-#plt.savefig("figure.png", format='png')
+# fig = plt.figure()
+# ax = plt.axes()
+# ax.plot(resultAlpha['Alpha'], resultAlpha['Precision'], '-b', label='Precision r=1')
+# ax.plot(resultR['Alpha'], resultR['Precision'], '-g', label='Precision r=5')
+# ax.legend(loc=2)
+# title = 'Power Means on ' + testBestSetNames[0] + '/' + testBestSetNames[1]
+# ax.set_title(title)
+# ax.set_xlabel('Alpha')
+# plt.savefig("figure.png", format='png')
 print >> outfile, resultAlpha
 print >> outfile, resultR
 print now(), "Phase 2 - Merge the best 2 RS's with Power Means done."
@@ -233,7 +281,7 @@ for key in f:
     f[key].seek(0)
     rec = pd.read_csv(f[key], sep=' ', header=None, names=['u', 'v', 'w'])
     drec = {k: g["v"].tolist() for k, g in rec.groupby("u")}
-    compare(key, drec, deva, target_user, count, resultMerge)
+    compareFolderOutput(key, "methods", drec, deva, target_user, count, resultMerge)
     count += 1
     f[key].close()
 print >> outfile, resultMerge

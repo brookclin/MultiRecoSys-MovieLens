@@ -9,7 +9,7 @@ def now():
 
 
 print now(), 'start clean'
-ratings = pd.read_csv('../MLens-ratings_no_timestamp.dat', header=None, sep=' ', names=['u', 'i', 'r'])
+ratings = pd.read_csv('../../MLens-ratings_no_timestamp.dat', header=None, sep=' ', names=['u', 'i', 'r'])
 users = (ratings['u'].unique())
 users = np.random.permutation(users)
 k = int(users.shape[0] * 0.9)
